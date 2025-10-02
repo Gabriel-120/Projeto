@@ -1,0 +1,107 @@
+/* --- Reset e Estilos Gerais (Serve para ambas as páginas) --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    /* IMPORTANTE: Coloque aqui a URL da sua imagem de fundo */
+    background-image: url(imagens/academia.jpg); /* Imagem de exemplo */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    backdrop-filter: blur(3px); /* Efeito de desfoque no fundo */
+}
+
+/* --- Container Principal (Serve para .login e .cadastro) --- */
+.login, .cadastro, .senha {
+    background-color: rgba(30, 30, 30, 0.90); /* Fundo escuro semi-transparente */
+    padding: 40px 30px;
+    border-radius: 25px;
+    width: 400px;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px; /* Espaçamento entre as seções internas */
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* --- Logo (Serve para ambas as páginas) --- */
+.login section:first-child img,
+.cadastro section:first-child img,
+.senha section:first-child img {
+    width: 100px; /* Ajuste o tamanho da sua logo */
+    margin-bottom: 10px;
+}
+
+/* --- Seção dos Inputs (Serve para .login-input e .cadastro-input) --- */
+.login-input, .cadastro-input, .senha-input {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.login-input label, .cadastro-input label, .senha-input label {
+    color: #e0e0e0;
+    font-size: 14px;
+    margin-bottom: 5px;
+}
+
+.login-input input, .cadastro-input input, .senha-input input {
+    background-color: #f0f0f0;
+    border: none;
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 16px;
+    margin-bottom: 15px;
+    /* Melhora a aparência do input de data */
+    -webkit-appearance: none; 
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* --- Link "Esqueceu sua senha?" (Apenas para tela de login) --- */
+.login-input a {
+    color: #c0c0c0;
+    text-decoration: none;
+    font-size: 12px;
+    text-align: right;
+    margin-top: -10px;
+    margin-bottom: 20px;
+}
+
+.login-input a:hover {
+    text-decoration: underline;
+}
+
+/* --- Seção dos Botões (Serve para ambas as páginas) --- */
+.redirect {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    gap: 15px; /* Espaço entre os botões */
+}
+
+.redirect button {
+    flex-grow: 1;
+    background-color: #e0e0e0;
+    color: #333;
+    border: none;
+    border-radius: 10px;
+    padding: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.redirect button:hover {
+    background-color: #cccccc;
+}

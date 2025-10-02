@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Login_Cadastro.css">
+    <title>TechFit - Login</title>
+<body>
+    <div class="container">
+        <main>
+            <div class="login">
+                <section>
+                    <img src="imagens/logo2.png" alt="Logo">
+                </section>
+                <section class="login-input">
+                    <label for="email">Email/CPF:</label>
+                    <input type="text" name="email/cpf" id="email" placeholder="Digite seu email/cpf">
+                    <label for="senha">Senha:</label>
+                    <input type="password" name="senha" id="senha" placeholder="Digite sua senha">
+                    <a href="">Esqueceu sua senha?</a>
+                </section>
+                <section class="redirect">
+                    <button onclick="logar()">Login</button>
+                    <button onclick="cadastro()">Cadastro</button>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function cadastro() {
+            window.location.href="Cadastro.html";
+        }
+    </script>
+</body>
+
+</html>
