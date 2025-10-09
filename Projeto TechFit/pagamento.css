@@ -1,0 +1,89 @@
+/* --- Reset e Estilos Gerais (Base reaproveitada) --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    /* IMPORTANTE: Certifique-se que o caminho da imagem está correto */
+    background-image: url(imagens/academia.jpg);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    backdrop-filter: blur(3px); /* Efeito de desfoque no fundo */
+}
+
+/* --- Container Principal da Página de Pagamento --- */
+.pagamento {
+    background-color: rgba(30, 30, 30, 0.90); /* Fundo escuro semi-transparente */
+    padding: 40px 50px;
+    border-radius: 25px;
+    width: 100%;
+    max-width: 800px; /* Aumentado para acomodar os itens lado a lado */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 25px; /* Espaçamento entre a logo, título e as formas de pagamento */
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* --- Logo --- */
+.pagamento .img img {
+    width: 120px; /* Ajuste o tamanho da sua logo se necessário */
+    margin-bottom: 10px;
+}
+
+/* --- Título "Selecione a forma de pagamento" --- */
+.pagamento h1 {
+    color: #e0e0e0;
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* --- Container das Formas de Pagamento --- */
+/* Este é o 'div' que envolve as três seções de pagamento */
+.pagamento > div {
+    width: 100%;
+    display: flex;
+    justify-content: space-around; /* Espaça os itens igualmente */
+    align-items: flex-start; /* Alinha os itens no topo */
+    margin-top: 20px;
+}
+
+/* --- Estilo para cada Opção de Pagamento Individual --- */
+/* Aplica-se a cada <section> que contém uma imagem e o texto */
+.pagamento > div > section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px; /* Espaço entre a imagem e o texto "Selecionar" */
+    cursor: pointer;
+}
+
+/* --- Imagens das Formas de Pagamento --- */
+.pagamento > div > section img {
+    height: 80px; /* Define uma altura fixa para as imagens */
+    width: auto;  /* Largura se ajusta para manter a proporção */
+    transition: transform 0.3s ease, opacity 0.3s ease; /* Efeito suave */
+}
+
+/* --- Efeito de Hover nas Imagens --- */
+.pagamento > div > section:hover img {
+    transform: scale(1.1); /* Aumenta um pouco a imagem */
+    opacity: 0.9; /* Deixa levemente transparente */
+}
+
+/* --- Texto "Selecionar" --- */
+/* (Você precisa adicionar este texto no seu HTML) */
+.pagamento > div > section p {
+    color: #c0c0c0;
+    font-size: 16px;
+    font-weight: bold;
+}
