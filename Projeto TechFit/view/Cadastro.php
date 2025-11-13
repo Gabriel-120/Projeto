@@ -1,8 +1,5 @@
 <?php
-// Incluir controller e modelo
 require_once __DIR__ . '/../controller/controller.php';
-// require_once __DIR__ . '/../model/cadastro.php';
-// require_once __DIR__ . '/../model/cadastroDAO.php';
 
 $mensagem_erro = '';
 $sucesso = false;
@@ -34,29 +31,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $mensagem_erro = 'CPF deve estar no formato: 000.000.000-00';
     }
     else {
-        // Se tudo estiver válido, criar o cadastro
+        // Validar duplicação
         try {
             $dao = new cadastroDAO();
             $cadastros = $dao->lerCadastro();
             
-            // Gerar próximo ID
-            if (empty($cadastros)) {
-                $id = 1;
-            } else {
-                $ultimo = end($cadastros);
-                $id = $ultimo->getId() + 1;
+            // Verificar se email, CPF ou nome já existem
+            $email_existe = false;
+            $cpf_existe = false;
+            $nome_existe = false;
+            
+            foreach ($cadastros as $cadastro) {
+                if (strtolower($cadastro->getEmail()) === strtolower($email)) {
+                    $email_existe = true;
+                }
+                if ($cadastro->getCpf() === $cpf) {
+                    $cpf_existe = true;
+                }
+                if (strtolower($cadastro->getNome()) === strtolower($nome)) {
+                    $nome_existe = true;
+                }
             }
             
-            // Hash de senha (segurança)
-            $senha_hash = password_hash($password, PASSWORD_DEFAULT);
+            // Exibir mensagens de duplicação
+            if ($email_existe) {
+                $mensagem_erro = 'Este email já está cadastrado.';
+            } elseif ($cpf_existe) {
+                $mensagem_erro = 'Este CPF já está cadastrado.';
+            } elseif ($nome_existe) {
+                $mensagem_erro = 'Este nome de usuário já está em uso.';
+            }
             
-            // Criar objeto e salvar
-            $novo_cadastro = new cadastro($id, $nome, $email, $cpf, $data_nascimento, $senha_hash);
-            $dao->CriarCadastro($novo_cadastro);
-            
-            $sucesso = true;
-            // Redirecionar para Login após 2 segundos
-            header('Refresh: 2; url=Login.html');
+            // Se não há duplicação, criar o cadastro
+            if (empty($mensagem_erro)) {
+                $cadastros = $dao->lerCadastro();
+                
+                // Gerar próximo ID
+                if (empty($cadastros)) {
+                    $id = 1;
+                } else {
+                    $ultimo = end($cadastros);
+                    $id = $ultimo->getId() + 1;
+                }
+                
+                // Hash de senha (segurança)
+                $senha_hash = password_hash($password, PASSWORD_DEFAULT);
+                
+                // Criar objeto e salvar
+                $novo_cadastro = new cadastro($id, $nome, $email, $cpf, $data_nascimento, $senha_hash);
+                $dao->CriarCadastro($novo_cadastro);
+                
+                $sucesso = true;
+                // Redirecionar para Login após 2 segundos
+                header('Refresh: 2; url=Login.php');
+            }
         } catch (Exception $e) {
             $mensagem_erro = 'Erro ao criar cadastro: ' . $e->getMessage();
         }
