@@ -45,7 +45,10 @@ id_aluno INT
 
 CREATE TABLE Usuarios (
 id_usuario INT AUTO_INCREMENT NOT NULL PRIMARY KEY PRIMARY KEY,
+nome varchar(100) not null,
 email VARCHAR(100) NOT NULL,
+cpf varchar(14) not null unique,
+data_nascimento date not null,
 tipo ENUM('usuario', 'funcionario') NOT NULL,
 senha_hash VARCHAR(255) NOT NULL,
 Avatar varchar(255) default'public/images/pfp/placeholder.png'
@@ -160,3 +163,5 @@ ALTER TABLE Aulas ADD FOREIGN KEY(id_modalidade) REFERENCES Modalidades (id_moda
 ALTER TABLE Aulas ADD FOREIGN KEY(id_filial) REFERENCES Filiais (id_filial);
 ALTER TABLE Mensagens ADD FOREIGN KEY(id_aluno) REFERENCES Alunos (id_aluno);
 ALTER TABLE Mensagens ADD FOREIGN KEY(id_funcionario) REFERENCES Funcionarios (id_funcionario);
+
+select * from usuarios;

@@ -1,0 +1,290 @@
+/* Tema preto e azul para Aula 16 — estilo moderno e interativo */
+:root {
+    --bg-dark: #0b0b0d;
+    --panel: #0f1720;
+    --accent: #1e90ff;
+    --accent-2: #0b63c6;
+    --muted: #9aa4b2;
+    --card: #0c1116;
+    --border: rgba(255, 255, 255, 0.06);
+    --success: #2ecc71;
+    --danger: #ff4d4f;
+    --radius: 8px;
+}
+
+* {
+    box-sizing: border-box
+}
+
+html,
+body {
+    height: 100%
+}
+
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+    background: linear-gradient(180deg, var(--bg-dark) 0%, #020203 100%);
+    color: #e6eef8;
+    display: flex;
+    justify-content: center;
+    padding: 28px 14px;
+}
+
+.container {
+    width: 100%;
+    max-width: 1100px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 22px;
+    box-shadow: 0 6px 30px rgba(2, 6, 23, 0.6);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px
+}
+
+.logo .mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #fff;
+    font-size: 18px;
+    box-shadow: 0 4px 18px rgba(14, 87, 255, 0.18)
+}
+
+.logo .title {
+    font-size: 20px;
+    font-weight: 700;
+    color: #fff
+}
+
+.logo .subtitle {
+    display: block;
+    color: var(--muted);
+    font-size: 13px
+}
+
+form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 18px
+}
+
+form input[type="text"],
+form select,
+form input[type="number"] {
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: inherit;
+    min-width: 160px;
+    transition: all .15s ease;
+    backdrop-filter: blur(4px)
+}
+
+form input::placeholder {
+    color: rgba(230, 238, 248, 0.45)
+}
+
+form input:focus,
+form select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 6px 24px rgba(30, 144, 255, 0.08);
+    transform: translateY(-1px)
+}
+
+/* Melhorias para dropdowns: tornar opções legíveis em tema escuro */
+select {
+    background: transparent;
+    color: inherit;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Definir cor de fundo e texto nas opções (funciona na maioria dos navegadores desktop) */
+select option {
+    background: var(--panel);
+    color: var(--muted);
+}
+
+select option:checked,
+select option[selected] {
+    background: rgba(30, 144, 255, 0.12);
+    color: #e6eef8;
+}
+
+select option:hover {
+    background: rgba(30, 144, 255, 0.08);
+    color: #fff;
+}
+
+button[type="submit"],
+input[type="submit"] {
+    background: linear-gradient(180deg, var(--accent), var(--accent-2));
+    color: white;
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    transition: transform .12s ease, box-shadow .12s ease
+}
+
+button[type="submit"]:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(14, 87, 255, 0.18)
+}
+
+button.secondary {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: var(--muted)
+}
+
+.table-wrap {
+    overflow: auto;
+    border-radius: 8px;
+    margin-top: 10px;
+    border: 1px solid var(--border)
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 720px
+}
+
+/* Garante que a linha final da tabela fique visível em tema escuro */
+table {
+    border-bottom: 1px solid var(--border);
+}
+
+tbody tr:last-child td {
+    border-bottom: 1px solid var(--border);
+}
+
+th,
+td {
+    padding: 12px 14px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02)
+}
+
+th {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+    color: var(--muted);
+    font-weight: 600
+}
+
+tbody tr {
+    transition: background .12s ease, transform .08s ease
+}
+
+tbody tr:nth-child(odd) {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), transparent)
+}
+
+tbody tr:hover {
+    background: linear-gradient(90deg, rgba(30, 144, 255, 0.03), rgba(30, 144, 255, 0.02));
+    transform: translateY(-2px)
+}
+
+.actions form {
+    display: inline-block;
+    margin: 0
+}
+
+.actions input[type="submit"] {
+    margin-right: 8px;
+    padding: 8px 12px;
+    border-radius: 7px;
+    border: 0;
+    cursor: pointer
+}
+
+.actions .edit {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid rgba(30, 144, 255, 0.12)
+}
+
+.actions .delete {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid rgba(255, 77, 79, 0.08)
+}
+
+.actions .edit:hover {
+    background: rgba(30, 144, 255, 0.06)
+}
+
+.actions .delete:hover {
+    background: rgba(255, 77, 79, 0.04)
+}
+
+@media (max-width:900px) {
+    table {
+        min-width: 640px
+    }
+}
+
+@media (max-width:700px) {
+    form {
+        flex-direction: column;
+        align-items: stretch
+    }
+
+    form input,
+    form select {
+        width: 100%
+    }
+
+    .logo .title {
+        font-size: 18px
+    }
+}
+
+.empty {
+    padding: 18px;
+    color: var(--muted);
+    text-align: center
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: translateY(6px)
+    }
+
+    to {
+        opacity: 1;
+        transform: none
+    }
+}
+
+.logo .title,
+.logo .subtitle {
+    animation: popIn .32s ease both
+}

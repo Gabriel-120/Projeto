@@ -7,7 +7,15 @@ if (!isset($_SESSION['usuario_id'])) {
     exit;
 }
 
+require_once __DIR__ . '/../controller/controller.php';
+
 $usuario_nome = isset($_SESSION['usuario_nome']) ? $_SESSION['usuario_nome'] : 'Usuário';
+$usuario_email = isset($_SESSION['usuario_email']) ? $_SESSION['usuario_email'] : '';
+$usuario_id = $_SESSION['usuario_id'];
+
+$controller = new CadastroController();
+$resultado_pagamentos = $controller->obterPagamentos($usuario_id);
+$pagamentos = $resultado_pagamentos['sucesso'] ? $resultado_pagamentos['pagamentos'] : [];
 ?>
 
 <!DOCTYPE html>
@@ -15,201 +23,242 @@ $usuario_nome = isset($_SESSION['usuario_nome']) ? $_SESSION['usuario_nome'] : '
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechFit - Home</title>
+    <link rel="stylesheet" href="Login_Cadastro.css">
+    <title>TechFit - Dashboard</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .header {
-            width: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
-            padding: 20px;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 1000;
+        .dashboard-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-
-        .header h1 {
-            color: #00d1ff;
-            font-size: 24px;
-        }
-
-        .header-user {
-            display: flex;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .header-user p {
-            color: #fff;
-            font-size: 16px;
-        }
-
-        .logout-btn {
-            background-color: #ff6b6b;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: background-color 0.3s ease;
-        }
-
-        .logout-btn:hover {
-            background-color: #ff5252;
-        }
-
-        .container {
-            margin-top: 100px;
-            background-color: rgba(30, 30, 30, 0.95);
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.45);
-            max-width: 800px;
-            width: 100%;
-            color: #fff;
-            text-align: center;
-        }
-
-        .container h2 {
-            color: #00d1ff;
-            font-size: 32px;
-            margin-bottom: 20px;
-        }
-
-        .container p {
-            font-size: 16px;
-            line-height: 1.6;
-            color: #e0e0e0;
             margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e0e0e0;
         }
 
-        .welcome-message {
-            background-color: rgba(0, 209, 255, 0.1);
-            border-left: 4px solid #00d1ff;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 30px;
+        .user-info h1 {
+            color: #1a1a1a;
+            font-size: 28px;
+            margin-bottom: 4px;
         }
 
-        .welcome-message h3 {
-            color: #00d1ff;
-            margin-bottom: 10px;
-        }
-
-        .features {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-top: 40px;
-        }
-
-        .feature {
-            background-color: rgba(0, 209, 255, 0.1);
-            padding: 20px;
-            border-radius: 8px;
-            border: 1px solid rgba(0, 209, 255, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .feature:hover {
-            background-color: rgba(0, 209, 255, 0.2);
-            border-color: #00d1ff;
-        }
-
-        .feature h4 {
-            color: #00d1ff;
-            margin-bottom: 10px;
-        }
-
-        .feature p {
+        .user-info p {
+            color: #666;
             font-size: 14px;
         }
 
+        .user-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .user-actions a, .user-actions button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .btn-pagamento {
+            background-color: #3498db;
+            color: white;
+        }
+
+        .btn-pagamento:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-logout {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            border: 1px solid #bdc3c7;
+        }
+
+        .btn-logout:hover {
+            background-color: #d5dbdb;
+        }
+
+        .dashboard-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background-color: #ffffff;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .section h2 {
+            color: #1a1a1a;
+            font-size: 18px;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .empty-message {
+            color: #95a5a6;
+            font-size: 14px;
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .pagamento-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            border-left: 4px solid #3498db;
+        }
+
+        .pagamento-info h3 {
+            color: #1a1a1a;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .pagamento-info p {
+            color: #666;
+            font-size: 12px;
+        }
+
+        .pagamento-valor {
+            font-weight: 700;
+            color: #27ae60;
+            font-size: 14px;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-confirmado {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-pendente {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
         @media (max-width: 600px) {
-            .header {
+            .dashboard-header {
                 flex-direction: column;
-                gap: 15px;
+                align-items: flex-start;
+                gap: 12px;
             }
 
-            .header-user {
+            .user-actions {
                 width: 100%;
-                justify-content: space-between;
+                flex-direction: column;
             }
 
-            .container {
-                padding: 20px;
-                margin-top: 140px;
+            .user-actions a, .user-actions button {
+                width: 100%;
+                text-align: center;
             }
 
-            .features {
-                grid-template-columns: 1fr;
+            .pagamento-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <h1>🏋️ TechFit</h1>
-        <div class="header-user">
-            <p>Bem-vindo, <strong><?php echo htmlspecialchars($usuario_nome); ?></strong>!</p>
-            <form action="logout.php" method="POST" style="margin: 0;">
-                <button type="submit" class="logout-btn">Sair</button>
-            </form>
-        </div>
-    </div>
-
-    <!-- Conteúdo Principal -->
     <div class="container">
-        <h2>Bem-vindo à TechFit!</h2>
-        
-        <div class="welcome-message">
-            <h3>✓ Você está logado com sucesso!</h3>
-            <p>Seu cadastro foi confirmado e você agora tem acesso a todos os nossos serviços.</p>
-        </div>
+        <main>
+            <div class="dashboard-container">
+                <!-- Header -->
+                <div class="dashboard-header">
+                    <div class="user-info">
+                        <h1>Bem-vindo, <?php echo htmlspecialchars($usuario_nome); ?>!</h1>
+                        <p><?php echo htmlspecialchars($usuario_email); ?></p>
+                    </div>
+                    <div class="user-actions">
+                        <a href="pagamentos.php" class="btn-pagamento">🛒 Comprar Plano</a>
+                        <a href="logout.php" class="btn-logout">Sair</a>
+                    </div>
+                </div>
 
-        <p>Explore nossos recursos e comece seu treino agora mesmo!</p>
+                <!-- Seção: Informações do Usuário -->
+                <div class="section">
+                    <h2>📋 Informações do Usuário</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div>
+                            <p style="color: #666; font-size: 12px; margin-bottom: 4px;">ID</p>
+                            <p style="color: #1a1a1a; font-weight: 600;"><?php echo $usuario_id; ?></p>
+                        </div>
+                        <div>
+                            <p style="color: #666; font-size: 12px; margin-bottom: 4px;">Email</p>
+                            <p style="color: #1a1a1a; font-weight: 600;"><?php echo htmlspecialchars($usuario_email); ?></p>
+                        </div>
+                    </div>
+                </div>
 
-        <!-- Features (placeholder para funcionalidades futuras) -->
-        <div class="features">
-            <div class="feature">
-                <h4>📋 Planos de Treino</h4>
-                <p>Acesse planos personalizados de acordo com seu nível de experiência.</p>
+                <!-- Seção: Histórico de Pagamentos -->
+                <div class="section">
+                    <h2>💳 Histórico de Pagamentos</h2>
+                    
+                    <?php if (empty($pagamentos)): ?>
+                        <div class="empty-message">
+                            Você não tem nenhum pagamento registrado. 
+                            <a href="pagamentos.php" style="color: #3498db; text-decoration: none; font-weight: 600;">Compre um plano</a>
+                        </div>
+                    <?php else: ?>
+                        <?php foreach ($pagamentos as $pagamento): ?>
+                            <div class="pagamento-item">
+                                <div class="pagamento-info">
+                                    <h3><?php echo htmlspecialchars($pagamento['plano']); ?></h3>
+                                    <p><?php echo date('d/m/Y H:i', strtotime($pagamento['data_pagamento'])); ?></p>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <span class="pagamento-valor">
+                                        R$ <?php echo number_format($pagamento['preco'], 2, ',', '.'); ?>
+                                    </span>
+                                    <span class="status-badge status-<?php echo strtolower($pagamento['status']); ?>">
+                                        <?php echo ucfirst($pagamento['status']); ?>
+                                    </span>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Seção: Ações Rápidas -->
+                <div class="section">
+                    <h2>⚡ Ações Rápidas</h2>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <a href="recuperar_senha.php" style="padding: 12px; background-color: #e8f4ff; color: #3498db; border-radius: 6px; text-decoration: none; text-align: center; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#d0e8ff'" onmouseout="this.style.backgroundColor='#e8f4ff'">
+                            🔐 Alterar Senha
+                        </a>
+                        <a href="logout.php" style="padding: 12px; background-color: #ffe5e5; color: #d32f2f; border-radius: 6px; text-decoration: none; text-align: center; font-weight: 600; transition: all 0.3s ease;" onmouseover="this.style.backgroundColor='#ffcccc'" onmouseout="this.style.backgroundColor='#ffe5e5'">
+                            🚪 Fazer Logout
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div class="feature">
-                <h4>👨‍🏫 Aulas Exclusivas</h4>
-                <p>Assista a aulas ao vivo e sob demanda com nossos instrutores.</p>
-            </div>
-            <div class="feature">
-                <h4>📊 Progresso</h4>
-                <p>Acompanhe seu progresso e conquistas ao longo do tempo.</p>
-            </div>
-            <div class="feature">
-                <h4>💪 Comunidade</h4>
-                <p>Conecte-se com outros usuários e compartilhe suas experiências.</p>
-            </div>
-        </div>
+        </main>
     </div>
+
+    <footer></footer>
 </body>
 </html>

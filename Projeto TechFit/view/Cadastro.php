@@ -2,7 +2,10 @@
 require_once __DIR__ . '/../controller/controller.php';
 
 $mensagem_erro = '';
-$sucesso = false;
+$mensagem_sucesso = '';
+
+// Criar instância do controller
+$controller = new CadastroController();
 
 // Verificar se o formulário foi submetido via POST
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -14,145 +17,122 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = isset($_POST['password']) ? $_POST['password'] : '';
     $confirm_password = isset($_POST['confirm_password']) ? $_POST['confirm_password'] : '';
 
-    // Validar campos obrigatórios
-    if (empty($nome) || empty($email) || empty($cpf) || empty($data_nascimento) || empty($password)) {
-        $mensagem_erro = 'Todos os campos são obrigatórios.';
-    } 
-    // Validar confirmação de senha
-    elseif ($password !== $confirm_password) {
-        $mensagem_erro = 'As senhas não conferem.';
-    }
-    // Validar email
-    elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $mensagem_erro = 'Email inválido.';
-    }
-    // Validar CPF (formato básico)
-    elseif (!preg_match('/^\d{3}\.\d{3}\.\d{3}-\d{2}$/', $cpf)) {
-        $mensagem_erro = 'CPF deve estar no formato: 000.000.000-00';
-    }
-    else {
-        // Validar duplicação
-        try {
-            $dao = new cadastroDAO();
-            $cadastros = $dao->lerCadastro();
-            
-            // Verificar se email, CPF ou nome já existem
-            $email_existe = false;
-            $cpf_existe = false;
-            $nome_existe = false;
-            
-            foreach ($cadastros as $cadastro) {
-                if (strtolower($cadastro->getEmail()) === strtolower($email)) {
-                    $email_existe = true;
-                }
-                if ($cadastro->getCpf() === $cpf) {
-                    $cpf_existe = true;
-                }
-                if (strtolower($cadastro->getNome()) === strtolower($nome)) {
-                    $nome_existe = true;
-                }
-            }
-            
-            // Exibir mensagens de duplicação
-            if ($email_existe) {
-                $mensagem_erro = 'Este email já está cadastrado.';
-            } elseif ($cpf_existe) {
-                $mensagem_erro = 'Este CPF já está cadastrado.';
-            } elseif ($nome_existe) {
-                $mensagem_erro = 'Este nome de usuário já está em uso.';
-            }
-            
-            // Se não há duplicação, criar o cadastro
-            if (empty($mensagem_erro)) {
-                $cadastros = $dao->lerCadastro();
-                
-                // Gerar próximo ID
-                if (empty($cadastros)) {
-                    $id = 1;
-                } else {
-                    $ultimo = end($cadastros);
-                    $id = $ultimo->getId() + 1;
-                }
-                
-                // Hash de senha (segurança)
-                $senha_hash = password_hash($password, PASSWORD_DEFAULT);
-                
-                // Criar objeto e salvar
-                $novo_cadastro = new cadastro($id, $nome, $email, $cpf, $data_nascimento, $senha_hash);
-                $dao->CriarCadastro($novo_cadastro);
-                
-                $sucesso = true;
-                // Redirecionar para Login após 2 segundos
-                header('Refresh: 2; url=Login.php');
-            }
-        } catch (Exception $e) {
-            $mensagem_erro = 'Erro ao criar cadastro: ' . $e->getMessage();
-        }
+    // Usar o controller para criar o cadastro
+    $resultado = $controller->criar($nome, $email, $cpf, $data_nascimento, $password, $confirm_password);
+
+    if ($resultado['sucesso']) {
+        $mensagem_sucesso = $resultado['mensagem'];
+        // Aguardar 2 segundos e redirecionar
+        header('Refresh: 2; url=Login.php');
+    } else {
+        $mensagem_erro = $resultado['erro'];
     }
 }
 ?>
 
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="Login_Cadastro.css">
     <title>TechFit - Cadastro</title>
 </head>
+
 <body>
     <div class="container">
         <main>
-            <!-- Form único para cadastro: action aponta para este mesmo arquivo (Cadastro.php) -->
             <div class="cadastro">
+                <!-- Logo -->
+                <section class="logo-section">
+                    <img src="imagens/logo2.png" alt="Logo TechFit" class="logo">
+                </section>
+
                 <!-- Exibir mensagem de erro se houver -->
                 <?php if (!empty($mensagem_erro)): ?>
-                    <div style="background-color: #ff6b6b; color: white; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-size: 14px;">
+                    <div class="alert alert-error">
                         <?php echo htmlspecialchars($mensagem_erro); ?>
                     </div>
                 <?php endif; ?>
 
                 <!-- Exibir mensagem de sucesso -->
-                <?php if ($sucesso): ?>
-                    <div style="background-color: #51cf66; color: white; padding: 12px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-size: 14px;">
-                        ✓ Cadastro realizado com sucesso! Redirecionando para login...
+                <?php if (!empty($mensagem_sucesso)): ?>
+                    <div class="alert alert-success">
+                        ✓ <?php echo htmlspecialchars($mensagem_sucesso); ?>
                     </div>
                 <?php else: ?>
+                    <!-- Formulário de Cadastro em Layout Lado a Lado -->
                     <form action="Cadastro.php" method="POST" id="registerForm" novalidate>
-                    <section>
-                        <img src="imagens/logo2.png" alt="Logo">
-                    </section>
-                    <section class="cadastro-input" id="cadastro-section">
-                            <label for="nome">Digite seu nome:</label>
-                            <input type="text" name="nome" id="nome" placeholder="Nome Completo" required>
-                            <label for="email">Digite seu email:</label>
-                            <input type="email" name="email" id="email" placeholder="exemplo@gmail.com" required>
-                            <label for="cpf">Digite seu CPF:</label>
-                            <input type="text" name="cpf" id="cpf" placeholder="EX: 123.456.789-00" required>
-                            <label for="data-nascimento">Data de Nascimento:</label>
-                            <input type="date" name="nascimento" id="data-nascimento" required>
+                        <div class="cadastro-container">
+                            <!-- Coluna Esquerda -->
+                            <div class="cadastro-left">
+                                <h2>Dados Pessoais</h2>
 
-                            <!-- Botões movidos para dentro da seção de cadastro para serem escondidos junto -->
-                            <div class="redirect">
-                                <button type="button" onclick="validarPrimeiraEtapa()" class="primary">Próximo</button>
-                                <button type="button" onclick="tenhoconta()" class="secondary">Voltar</button>
+                                <div class="form-group">
+                                    <label for="nome">Nome Completo *</label>
+                                    <input type="text" name="nome" id="nome" placeholder="Digite seu nome completo"
+                                        value="<?php echo isset($_POST['nome']) ? htmlspecialchars($_POST['nome']) : ''; ?>" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="email">Email *</label>
+                                    <input type="email" name="email" id="email" placeholder="exemplo@gmail.com"
+                                        value="<?php echo isset($_POST['email']) ? htmlspecialchars($_POST['email']) : ''; ?>" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="cpf">CPF *</label>
+                                    <input type="text" name="cpf" id="cpf" placeholder="000.000.000-00"
+                                        value="<?php echo isset($_POST['cpf']) ? htmlspecialchars($_POST['cpf']) : ''; ?>" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="nascimento">Data de Nascimento *</label>
+                                    <input type="date" name="nascimento" id="nascimento"
+                                        value="<?php echo isset($_POST['nascimento']) ? htmlspecialchars($_POST['nascimento']) : ''; ?>" required>
+                                </div>
+                                <div class="form-group">
+                                    <input type="checkbox" name="termos" id="termos"><label for="termos">li e aceito os <a href="Termos.html">termos de uso e condições</a></label>
+                                </div>
+                                
                             </div>
-                        </section>
 
-                    <!-- Seção de senha - inicialmente escondida, faz parte do mesmo form -->
-                    <section id="senha" class="senha" style="display:none;">
-                        <section class="senha-input">
-                            <label for="senha">Digite sua senha:</label>
-                            <input type="password" name="password" id="senha-input" placeholder="Digite sua senha" required>
-                            <label for="conf-senha">Confirme sua senha:</label>
-                            <input type="password" name="confirm_password" id="conf-senha" placeholder="Confirme sua senha" required>
-                        </section>
-                        <section class="redirect">
-                            <!-- submit envia todos os dados do form para o backend -->
-                            <button type="submit" class="primary">Cadastrar</button>
-                            <button type="button" onclick="mostrarsecao('cadastro')" class="secondary">Voltar</button>
-                        </section>
-                    </section>
+
+                            <!-- Coluna Direita -->
+                            <div class="cadastro-right">
+                                <h2>Segurança</h2>
+
+                                <div class="form-group">
+                                    <label for="password">Senha *</label>
+                                    <input type="password" name="password" id="password" placeholder="Digite sua senha" required>
+                                    <small class="form-hint">Mínimo 6 caracteres</small>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="confirm_password">Confirmar Senha *</label>
+                                    <input type="password" name="confirm_password" id="confirm_password"
+                                        placeholder="Confirme sua senha" required>
+                                </div>
+
+                                <div class="password-strength" id="passwordStrength" style="display: none;">
+                                    <div class="strength-meter">
+                                        <div class="strength-bar" id="strengthBar"></div>
+                                    </div>
+                                    <span class="strength-text" id="strengthText"></span>
+                                </div>
+                            </div>
+                        </div>
+                
+
+                        <!-- Botões -->
+                        <div class="cadastro-buttons">
+                            <button type="submit" class="btn-primary">Cadastrar</button>
+                        </div>
+
+                        <p class="form-link">
+                            Já tem conta? <a href="Login.php">Faça login aqui</a>
+                        </p>
                     </form>
                 <?php endif; ?>
             </div>
@@ -162,105 +142,84 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <footer></footer>
 
     <script>
-        // Alternador de etapas: quando o usuário clica em "Próximo" esconde a primeira parte e mostra a parte de senha.
-        document.addEventListener('DOMContentLoaded', function () {
-            const step1 = document.getElementById('cadastro-section');
-            const step2 = document.getElementById('senha');
-            if (!step1 || !step2) return;
+        // Monitorar força da senha
+        document.getElementById('password').addEventListener('input', function() {
+            const senha = this.value;
+            const strengthDiv = document.getElementById('passwordStrength');
+            const strengthBar = document.getElementById('strengthBar');
+            const strengthText = document.getElementById('strengthText');
 
-            // estado inicial
-            step1.style.display = 'block';
-            step2.style.display = 'none';
+            if (senha.length === 0) {
+                strengthDiv.style.display = 'none';
+                return;
+            }
 
-            // botão Voltar (na seção de senha)
-            const backBtns = step2.querySelectorAll('.redirect button.secondary');
-            backBtns.forEach(function (btn) {
-                btn.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    step2.style.display = 'none';
-                    step1.style.display = 'block';
-                    const nomeInput = document.getElementById('nome');
-                    if (nomeInput) nomeInput.focus();
-                });
-            });
+            strengthDiv.style.display = 'block';
+
+            let forca = 0;
+            let texto = '';
+            let cor = '';
+
+            // Verificar comprimento
+            if (senha.length >= 6) forca += 20;
+            if (senha.length >= 8) forca += 20;
+            if (senha.length >= 12) forca += 20;
+
+            // Verificar tipos de caracteres
+            if (/[a-z]/.test(senha)) forca += 10;
+            if (/[A-Z]/.test(senha)) forca += 10;
+            if (/[0-9]/.test(senha)) forca += 10;
+            if (/[^a-zA-Z0-9]/.test(senha)) forca += 10;
+
+            if (forca < 40) {
+                texto = 'Fraca';
+                cor = '#ff6b6b';
+            } else if (forca < 70) {
+                texto = 'Média';
+                cor = '#ffd93d';
+            } else {
+                texto = 'Forte';
+                cor = '#51cf66';
+            }
+
+            strengthBar.style.width = forca + '%';
+            strengthBar.style.backgroundColor = cor;
+            strengthText.textContent = texto;
+            strengthText.style.color = cor;
         });
 
-        function validarPrimeiraEtapa() {
-            const nome = document.getElementById('nome').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const cpf = document.getElementById('cpf').value.trim();
-            const data = document.getElementById('data-nascimento').value.trim();
+        // Validar confirmação de senha
+        document.getElementById('confirm_password').addEventListener('input', function() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = this.value;
 
-            // Validar campos
-            if (!nome || !email || !cpf || !data) {
-                alert('Todos os campos são obrigatórios.');
-                return;
+            if (confirmPassword.length > 0) {
+                if (password === confirmPassword) {
+                    this.style.borderColor = '#51cf66';
+                } else {
+                    this.style.borderColor = '#ff6b6b';
+                }
+            }
+        });
+
+        // Validar formulário ao enviar
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirm_password').value;
+
+            if (password !== confirmPassword) {
+                e.preventDefault();
+                alert('As senhas não conferem!');
+                return false;
             }
 
-            // Validar email (formato básico)
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert('Email inválido.');
-                return;
-            }
-
-            // Validar CPF (formato)
-            const cpfRegex = /^\d{3}\.\d{3}\.\d{3}-\d{2}$/;
-            if (!cpfRegex.test(cpf)) {
-                alert('CPF deve estar no formato: 000.000.000-00');
-                return;
-            }
-
-            // Se passou em todas as validações, avançar para seção de senha
-            mostrarsecao('senha');
-        }
-
-        function mostrarsecao(secao) {
-            const step1 = document.getElementById('cadastro-section');
-            const step2 = document.getElementById('senha');
-            if (!step1 || !step2) return;
-
-            if (secao === 'senha') {
-                step1.style.display = 'none';
-                step2.style.display = 'block';
-                const senhaInput = document.getElementById('senha-input');
-                if (senhaInput) senhaInput.focus();
-            } else if (secao === 'cadastro') {
-                step2.style.display = 'none';
-                step1.style.display = 'block';
-                const nomeInput = document.getElementById('nome');
-                if (nomeInput) nomeInput.focus();
-            }
-        }
-
-        function tenhoconta() {
-            window.location.href = "Login.html";
-        }
-
-        // Validar confirmação de senha no submit
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('registerForm');
-            if (form) {
-                form.addEventListener('submit', function(e) {
-                    const password = document.getElementById('senha-input').value;
-                    const confirmPassword = document.getElementById('conf-senha').value;
-                    
-                    if (password !== confirmPassword) {
-                        e.preventDefault();
-                        alert('As senhas não conferem!');
-                        document.getElementById('conf-senha').focus();
-                        return false;
-                    }
-                    
-                    if (password.length < 6) {
-                        e.preventDefault();
-                        alert('A senha deve ter pelo menos 6 caracteres.');
-                        document.getElementById('senha-input').focus();
-                        return false;
-                    }
-                });
+            if (password.length < 6) {
+                e.preventDefault();
+                alert('A senha deve ter no mínimo 6 caracteres.');
+                return false;
             }
         });
     </script>
 </body>
+
 </html>
