@@ -9,3 +9,6 @@
     require_once __DIR__ . "/../models/CadastroModel.php";
     require_once __DIR__ . "/../models/RecuperacaoModel.php";
     require_once __DIR__ . "/../models/PagamentoModel.php";
+    require_once __DIR__ . "/../models/Avaliacao.php";
+    require_once __DIR__ . "/../models/Checkin.php";
+    require_once __DIR__ . "/../models/Suporte.php";
