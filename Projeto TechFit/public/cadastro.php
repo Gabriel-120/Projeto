@@ -1,6 +1,11 @@
 <?php
 require_once __DIR__ . '/../app/helpers/loadModels.php';
 
+// Garantir sessão ativa
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 $mensagem_erro = '';
 $mensagem_sucesso = '';
 
@@ -30,17 +35,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../Gabriel/view/Login_Cadastro.css">
+    <link rel="stylesheet" href="/assets/css/Login_Cadastro.css">
     <title>TechFit - Cadastro</title>
 </head>
 <body>
-    <div class="container">
-        <main>
-            <div class="cadastro">
-                <section class="logo-section">
-                    <img src="../Gabriel/view/imagens/logo2.png" alt="Logo TechFit" class="logo">
-                </section>
+    <div class="login-page">
+        <div class="container">
+            <div class="main-card">
+            <section class="logo-section">
+                <img src="/assets/images/logo.png" alt="Logo TechFit" class="logo">
+            </section>
 
+            <section class="form-section">
                 <?php if (!empty($mensagem_erro)): ?>
                     <div class="alert alert-error"><?php echo htmlspecialchars($mensagem_erro); ?></div>
                 <?php endif; ?>
@@ -93,8 +99,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <p class="form-link">Já tem conta? <a href="login.php">Faça login aqui</a></p>
                     </form>
                 <?php endif; ?>
+            </section>
             </div>
-        </main>
+        </div>
     </div>
 
     <script>
@@ -127,6 +134,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const confirm = document.getElementById('confirm_password').value;
             if (password !== confirm) { e.preventDefault(); alert('As senhas não conferem!'); return false; }
             if (password.length < 6) { e.preventDefault(); alert('A senha deve ter no mínimo 6 caracteres.'); return false; }
+        });
+
+        // CPF mask
+        const cpfInput = document.getElementById('cpf');
+        cpfInput.addEventListener('input', function(e){
+            let v = this.value.replace(/\D/g,'');
+            if (v.length > 11) v = v.slice(0,11);
+            v = v.replace(/(\d{3})(\d)/, '$1.$2');
+            v = v.replace(/(\d{3})(\d)/, '$1.$2');
+            v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            this.value = v;
+        });
+
+        function validateCPF(cpf){
+            cpf = cpf.replace(/\D/g,'');
+            if (cpf.length !== 11) return false;
+            // simples verificação de repetição
+            if (/^(\d)\1+$/.test(cpf)) return false;
+            // cálculo básico
+            let sum = 0, rest;
+            for (let i=1;i<=9;i++) sum = sum + parseInt(cpf.substring(i-1,i)) * (11 - i);
+            rest = (sum * 10) % 11;
+            if ((rest === 10) || (rest === 11)) rest = 0;
+            if (rest !== parseInt(cpf.substring(9,10))) return false;
+            sum = 0;
+            for (let i=1;i<=10;i++) sum = sum + parseInt(cpf.substring(i-1,i)) * (12 - i);
+            rest = (sum * 10) % 11;
+            if ((rest === 10) || (rest === 11)) rest = 0;
+            if (rest !== parseInt(cpf.substring(10,11))) return false;
+            return true;
+        }
+
+        document.getElementById('registerForm').addEventListener('submit', function(e){
+            const cpf = document.getElementById('cpf').value;
+            if (!validateCPF(cpf)) { e.preventDefault(); alert('CPF inválido'); return false; }
         });
     </script>
 </body>

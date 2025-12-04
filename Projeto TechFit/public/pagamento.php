@@ -1,9 +1,14 @@
 <?php
 require_once __DIR__ . '/../app/helpers/loadModels.php';
+// garantir sessão ativa
+if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 
-// Espera-se que o usuário esteja logado
-if (!isset($_SESSION['usuario_id'])) {
-    header('Location: login.php');
+// aceitar ambos os nomes de chave de sessão usados no projeto
+$usuarioSessKey = isset($_SESSION['usuario_id']) ? 'usuario_id' : (isset($_SESSION['user_id']) ? 'user_id' : null);
+if ($usuarioSessKey === null) {
+    // redirecionar para login mantendo retorno para a página de pagamento
+    $return = urlencode($_SERVER['REQUEST_URI']);
+    header('Location: login.php?return_to=' . $return);
     exit;
 }
 
@@ -12,11 +17,16 @@ $plano = isset($_GET['plano']) ? trim($_GET['plano']) : (isset($_POST['plano'])?
 $preco = isset($_GET['preco']) ? floatval($_GET['preco']) : (isset($_POST['preco'])?floatval($_POST['preco']):0.0);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar'])) {
-    $res = PagamentoModel::criarPagamentoPorUsuario((int)$_SESSION['usuario_id'], $plano, $preco);
-    if ($res['sucesso']) {
-        $mensagem = 'Pagamento registrado com sucesso.';
+    $uid = isset($_SESSION['usuario_id']) ? (int)$_SESSION['usuario_id'] : (isset($_SESSION['user_id']) ? (int)$_SESSION['user_id'] : 0);
+    if ($uid <= 0) {
+        $mensagem = 'Usuário não identificado. Faça login novamente.';
     } else {
-        $mensagem = 'Erro ao registrar pagamento.';
+        $res = PagamentoModel::criarPagamentoPorUsuario($uid, $plano, $preco);
+        if (!empty($res['sucesso'])) {
+            $mensagem = 'Pagamento registrado com sucesso.';
+        } else {
+            $mensagem = 'Erro ao registrar pagamento.';
+        }
     }
 }
 ?>

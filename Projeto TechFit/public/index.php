@@ -28,21 +28,48 @@ if (isset($_SESSION['user_id'])) {
     }
 }
 
-$uri = rtrim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+// Normalizar base do script para que a rota funcione mesmo quando o index.php
+// aparece na URL (ex: /meuProjeto/public/index.php)
+$scriptName = str_replace('\\', '/', $_SERVER['SCRIPT_NAME']); // ex: /meuProjeto/public/index.php
+$baseDir = rtrim(str_replace('index.php', '', $scriptName), '/'); // ex: /meuProjeto/public
+
+if ($baseDir !== '' && strpos($path, $baseDir) === 0) {
+    $uri = substr($path, strlen($baseDir));
+} else {
+    $uri = $path;
+}
+
+// garantir formato '/segment' ou '' para raiz
+$uri = '/' . ltrim($uri, '/');
+$uri = rtrim($uri, '/');
+if ($uri === '/index.php' || $uri === '/index.php/') {
+    $uri = '';
+}
+// raiz vazia representada por string vazia (combina com rota '')
+if ($uri === '/') {
+    $uri = '';
+}
 
 $routes = [
     ''          => '../app/controllers/homeController.php',
     '/profile'  => '../app/controllers/profileController.php',
     '/logout'   => 'logout.php', 
     '/aulas' => '../app/controllers/aulasController.php',
+    '/aulas/agendar' => '../app/controllers/aulasController.php',
     '/comunicados' => '../app/controllers/comunicadoPublicController.php',
     '/adm/comunicados' => '../app/controllers/comunicadoAdmController.php',
+    '/admin' => '../app/controllers/adminController.php',
+    '/admin/painel' => '../app/controllers/adminController.php',
+    '/admin/usuarios' => '../app/controllers/adminController.php',
     '/sobre' => '../app/controllers/sobreController.php',
     '/contato' => '../app/controllers/contatoController.php',
     '/cadastro' => 'cadastro.php',
     '/login' => 'login.php',
     '/recuperar_senha' => 'recuperar_senha.php',
     '/pagamento' => 'pagamento.php',
+    '/planos' => '../app/controllers/planosController.php',
     
 ];
 

@@ -1,14 +1,20 @@
 <?php
 function flash(string $message, string $type = "success"){
 
-    $_SESSION["flash"][$type] = $message;
+    // allow multiple messages per type
+    if (!isset($_SESSION['flash'])) $_SESSION['flash'] = [];
+    if (!isset($_SESSION['flash'][$type]) || !is_array($_SESSION['flash'][$type])) {
+        $_SESSION['flash'][$type] = [];
+    }
+    $_SESSION['flash'][$type][] = $message;
 
 }
 
 function get_flash($type){
-    $message = $_SESSION['flash'][$type];
-    unset ($_SESSION['flash'][$type]);
-    return $message;
+    if (empty($_SESSION['flash'][$type])) return [];
+    $messages = $_SESSION['flash'][$type];
+    unset($_SESSION['flash'][$type]);
+    return is_array($messages) ? $messages : [$messages];
 }
 
 function has_flash($type){

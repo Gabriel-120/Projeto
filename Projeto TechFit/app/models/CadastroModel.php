@@ -61,7 +61,7 @@ class CadastroModel {
                 return ['sucesso' => false, 'erro' => 'Este nome de usuário já existe'];
             }
 
-            $tipo = self::endsWithTechfit($email) ? 'funcionario' : 'usuario';
+            $tipo = self::endsWithTechfit($email) ? 'funcionario' : 'aluno';
 
             $pdo = self::getPDO();
             $pdo->beginTransaction();
@@ -83,38 +83,20 @@ class CadastroModel {
             $usuarioId = (int) $pdo->lastInsertId();
 
             if ($tipo === 'funcionario') {
-                // Inserir registro mínimo em Funcionarios
-                $sqlF = "INSERT INTO Funcionarios (nome_funcionario, salario, carga_horaria, cpf_funcionario, cargo, id_usuario) VALUES (:nome_funcionario, :salario, :carga, :cpf_funcionario, :cargo, :id_usuario)";
-                $stmtF = $pdo->prepare($sqlF);
-                $stmtF->execute([
-                    ':nome_funcionario' => $nome,
-                    ':salario' => 0.00,
-                    ':carga' => 0,
-                    ':cpf_funcionario' => $cpf,
-                    ':cargo' => 'Funcionário',
-                    ':id_usuario' => $usuarioId
-                ]);
-                $idExtra = (int) $pdo->lastInsertId();
+                // Não inserir na tabela Funcionarios: apenas criar em Usuarios com tipo 'funcionario'.
+                $idExtra = null;
             } else {
-                // Inserir registro mínimo em Alunos
+                // Inserir registro mínimo em Alunos (ajustado ao schema atual)
                 $codigoAcesso = bin2hex(random_bytes(6));
-                $hoje = date('Y-m-d');
-                $dataFim = date('Y-m-d', strtotime('+1 year'));
 
-                $sqlA = "INSERT INTO Alunos (data_agendamento, data_nascimento, endereco, nome_aluno, telefone, genero, codigo_acesso, id_usuario, status_aluno, data_inicio, data_fim) VALUES (:data_agendamento, :data_nascimento, :endereco, :nome_aluno, :telefone, :genero, :codigo_acesso, :id_usuario, :status_aluno, :data_inicio, :data_fim)";
+                $sqlA = "INSERT INTO Alunos (genero, endereco, telefone, codigo_acesso, id_usuario) VALUES (:genero, :endereco, :telefone, :codigo_acesso, :id_usuario)";
                 $stmtA = $pdo->prepare($sqlA);
                 $stmtA->execute([
-                    ':data_agendamento' => $hoje,
-                    ':data_nascimento' => $data_nascimento,
-                    ':endereco' => '',
-                    ':nome_aluno' => $nome,
-                    ':telefone' => '',
                     ':genero' => 'N/D',
+                    ':endereco' => '',
+                    ':telefone' => '',
                     ':codigo_acesso' => $codigoAcesso,
-                    ':id_usuario' => $usuarioId,
-                    ':status_aluno' => 'ativo',
-                    ':data_inicio' => $hoje,
-                    ':data_fim' => $dataFim
+                    ':id_usuario' => $usuarioId
                 ]);
                 $idExtra = (int) $pdo->lastInsertId();
             }

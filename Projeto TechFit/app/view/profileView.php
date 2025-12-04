@@ -5,12 +5,15 @@
             <div class="flex mt-5 flex-col items-center">
                 <img src="<?= htmlspecialchars($user_pfp) ?>" alt="Foto de Perfil"
                      class="size-40 ring-2 ring-white rounded-full mb-2 border-4 border-gray-300">
-                <p class="font-bold text-black-900 text-lg"><?= htmlspecialchars($user_name) ?></p>
+                <p class="font-bold text-black-900 text-lg"><?= htmlspecialchars($user_name) ?> <?php if (!empty($needs_complete)): ?><span title="Concluir cadastro" style="display:inline-block;width:10px;height:10px;background:red;border-radius:50%;margin-left:8px;"></span><?php endif; ?></p>
                 <p class="text-gray-600"><?= htmlspecialchars($user_tipo) ?></p>
             </div>
 
             <nav class="mt-6 flex flex-col space-y-3">
                 <?php if (strtolower($user_tipo) === 'aluno'): ?>
+                    <?php if (!empty($needs_complete)): ?>
+                        <a href="/profile?page=concluir" class="text-decoration-none text-black p-2 rounded-md flex items-center gap-2 <?= ($currPage === 'concluir') ? 'bg-blue-600 text-white' : 'hover:bg-[#cfcfcf]' ?>">🔴 Concluir Cadastro</a>
+                    <?php endif; ?>
                     <a href="/profile?page=agenda" class="text-decoration-none text-black p-2 rounded-md flex items-center gap-2
                        <?= ($currPage === 'agenda') ? 'bg-blue-600 text-white' : 'hover:bg-[#cfcfcf]' ?>">
                        📅 Minha Agenda

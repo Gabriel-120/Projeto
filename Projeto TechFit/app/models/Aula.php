@@ -23,7 +23,8 @@ class Aulas
     public static function getInscritos(int $id_aula): int
     {
         $pdo = self::getPDO();
-        $sql = 'SELECT COUNT(*) FROM Agendamento WHERE id_aula = :id_aula';
+        // contar somente agendados (vagas ocupadas)
+        $sql = "SELECT COUNT(*) FROM Agendamento WHERE id_aula = :id_aula AND status = 'agendado'";
 
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':id_aula', $id_aula, PDO::PARAM_INT);
@@ -92,13 +93,16 @@ class Aulas
                 A.nome_aula,
                 A.descricao,
                 M.nome_modalidade,
-                F.nome_filial
+                F.nome_filial,
+                Ag.status AS ag_status,
+                Ag.data_agendamento AS ag_data,
+                Ag.id_agendamento AS ag_id
             FROM Aulas A
             JOIN Modalidades M ON A.id_modalidade = M.id_modalidade
             JOIN Filiais F ON A.id_filial = F.id_filial
-            JOIN Agendamento Ag ON A.id_aula = Ag.id_aula
-            WHERE Ag.id_aluno = :id_aluno
-              AND Ag.status = 'agendado'
+                        JOIN Agendamento Ag ON A.id_aula = Ag.id_aula
+                        WHERE Ag.id_aluno = :id_aluno
+                            AND (Ag.status = 'agendado' OR Ag.status = 'espera')
         ";
 
         if ($id_modalidade !== null && $id_modalidade !== 'todas') {
@@ -115,5 +119,27 @@ class Aulas
 
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Retorna a posição do aluno na lista de espera para uma aula (1 = primeiro da fila)
+     * @param int $id_aula
+     * @param int $id_aluno
+     * @return int|null retorna null se não estiver na lista
+     */
+    public static function getWaitlistPosition(int $id_aula, int $id_aluno): ?int
+    {
+        $pdo = self::getPDO();
+        // verificar se está na lista
+        $check = $pdo->prepare("SELECT id_agendamento, data_agendamento FROM Agendamento WHERE id_aula = :id_aula AND id_aluno = :id_aluno AND status = 'espera' LIMIT 1");
+        $check->execute([':id_aula' => $id_aula, ':id_aluno' => $id_aluno]);
+        $row = $check->fetch(PDO::FETCH_ASSOC);
+        if (!$row) return null;
+        $myTime = $row['data_agendamento'];
+
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM Agendamento WHERE id_aula = :id_aula AND status = 'espera' AND data_agendamento <= :mytime");
+        $stmt->execute([':id_aula' => $id_aula, ':mytime' => $myTime]);
+        $pos = (int)$stmt->fetchColumn();
+        return $pos > 0 ? $pos : 1;
     }
 }

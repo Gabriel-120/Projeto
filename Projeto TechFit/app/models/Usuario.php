@@ -19,7 +19,7 @@ class Usuario
     {
         $pdo = self::getPDO();
 
-        $sql  = "SELECT id_usuario, nome, email, tipo, avatar FROM Usuarios WHERE id_usuario = :id_usuario";
+        $sql  = "SELECT id_usuario, nome, email, cpf, tipo, avatar FROM Usuarios WHERE id_usuario = :id_usuario";
         $stmt = $pdo->prepare($sql);
         $stmt->bindValue(':id_usuario', $id_usuario, PDO::PARAM_INT);
         $stmt->execute();
@@ -33,6 +33,7 @@ class Usuario
             'user_id'        => $usuario['id_usuario'],
             'user_name'      => $usuario['nome'],
             'user_email'     => $usuario['email'],
+            'user_cpf'       => $usuario['cpf'] ?? '',
             'user_tipo'      => $usuario['tipo'],
             'user_avatar'    => $usuario['avatar'] ?: '/assets/images/upload/pfp/avatar.png',
             'id_funcionario' => $usuario['tipo'] === 'funcionario' ? $usuario['id_usuario'] : null,

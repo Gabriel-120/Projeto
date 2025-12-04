@@ -56,11 +56,25 @@
                             <p><strong>Sobre a aula:</strong><?=$aula["descricao"]?></p>
                         </div>
                         <div class="mt-3 pt-3 border-t border-gray-100">
-                        <form action="/profile?page=agenda" method="POST" style="display:inline;">
+                        <?php
+                            $status = $aula['ag_status'] ?? 'agendado';
+                        ?>
+                        <div style="display:flex;align-items:center;gap:12px;">
+                        <?php if ($status === 'agendado'): ?>
+                            <span class="badge badge-green">Agendado</span>
+                        <?php elseif ($status === 'espera'): ?>
+                            <?php $pos = Aulas::getWaitlistPosition($aula['id_aula'], $_SESSION['user_id'] ? (Aluno::getAlunoByUserID($_SESSION['user_id'])['id_aluno'] ?? 0) : 0); ?>
+                            <span class="badge badge-yellow">Lista de espera (posição: <?php echo $pos ?? '—' ?>)</span>
+                        <?php else: ?>
+                            <span class="badge badge-gray"><?php echo htmlspecialchars($status) ?></span>
+                        <?php endif; ?>
+
+                        <form action="/profile?page=agenda" method="POST" style="display:inline;margin-left:8px;">
                             <input type="hidden" name="action" value="cancelar">
                             <input type="hidden" name="agendamento_id" value="<?php echo $aula['id_aula']; ?>">
                             <button type="submit" class="btn-cancelar">Cancelar</button>
                         </form>
+                        </div>
 
                         </div>
                     </div>

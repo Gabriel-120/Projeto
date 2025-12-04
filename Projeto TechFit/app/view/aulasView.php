@@ -43,13 +43,26 @@
                         <p class="text-sm text-gray-700"><strong>Data:</strong>                                                                                                                                                                                                                                              <?php echo date('d/m/Y', strtotime($aula["dia_aula"])) ?></p>
                     </div>
 
-                    <form action="aulas/agendar" method="post" class="mt-4">
-                        <input type="hidden" name="id_aula" value="<?php echo $aula['id_aula'] ?>">
-                        <button type="submit"
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg shadow-sm transition duration-200">
-                            Agendar Aula
-                        </button>
-                    </form>
+                    <?php
+                        $isBooked = !empty($booked[$aula['id_aula']]);
+                        $isWait = !empty($waitlist[$aula['id_aula']]);
+                        $inscritos = Aulas::getInscritos($aula['id_aula']);
+                        $lotada = $inscritos >= $aula['quantidade_pessoas'];
+                    ?>
+                    <?php if ($isBooked): ?>
+                        <button disabled class="w-full bg-gray-400 text-white font-medium py-2.5 rounded-lg shadow-sm">Já Agendado</button>
+                    <?php elseif ($isWait): ?>
+                        <button disabled class="w-full bg-yellow-500 text-white font-medium py-2.5 rounded-lg shadow-sm">Na lista de espera</button>
+                    <?php else: ?>
+                        <form action="/aulas/agendar" method="post" class="mt-4">
+                            <input type="hidden" name="id_aula" value="<?php echo $aula['id_aula'] ?>">
+                            <?php if ($lotada): ?>
+                                <button type="submit" class="w-full bg-yellow-600 hover:bg-yellow-700 text-white font-medium py-2.5 rounded-lg shadow-sm transition duration-200">Entrar na lista de espera</button>
+                            <?php else: ?>
+                                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2.5 rounded-lg shadow-sm transition duration-200">Agendar Aula</button>
+                            <?php endif; ?>
+                        </form>
+                    <?php endif; ?>
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>

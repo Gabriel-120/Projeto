@@ -1,0 +1,43 @@
+/* Modern clean styles for login and cadastro pages */
+:root{
+  --bg:#f6f9fc;
+  --card:#ffffff;
+  --primary:#0d6efd;
+  --accent:#22c55e;
+  --muted:#6b7280;
+  --danger:#ef4444;
+  --radius:12px;
+}
+*{box-sizing:border-box}
+body{font-family:Inter, ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; background:linear-gradient(180deg, #f8fafc 0%, var(--bg) 100%); color:#111827; margin:0;}
+.login-page .container{min-height:100vh; display:flex; align-items:center; justify-content:center; padding:32px}
+.main-card{width:100%; max-width:980px; display:flex; gap:24px; align-items:stretch}
+.logo-section{flex:1; background:linear-gradient(180deg,#fff 0%, #f9fafb 100%); border-radius:var(--radius); padding:32px; display:flex; align-items:center; justify-content:center; box-shadow:0 8px 24px rgba(15,23,42,0.06)}
+.logo{max-width:240px}
+.form-section{flex:1; background:var(--card); border-radius:var(--radius); padding:28px; box-shadow:0 12px 36px rgba(15,23,42,0.06)}
+.login-container h2, .cadastro-container h2{margin:0 0 16px 0; font-size:20px}
+.form-group{margin-bottom:14px}
+label{display:block; font-size:13px; color:var(--muted); margin-bottom:6px}
+input[type=text], input[type=email], input[type=password], input[type=date], select, textarea{width:100%; padding:10px 12px; border-radius:8px; border:1px solid #e6e9ef; background:#fff; outline:none; transition:box-shadow 120ms, border-color 120ms}
+input:focus, select:focus, textarea:focus{box-shadow:0 6px 18px rgba(13,110,253,0.08); border-color:var(--primary)}
+.btn-primary{display:inline-block; background:var(--primary); color:#fff; padding:10px 16px; border-radius:10px; border:none; cursor:pointer; font-weight:600}
+.btn-primary:hover{filter:brightness(.98)}
+.alert{padding:10px 12px; border-radius:8px; margin-bottom:12px}
+.alert-error{background:#fff5f5; color:var(--danger); border:1px solid #fee2e2}
+.alert-success{background:#ecfdf5; color:var(--accent); border:1px solid #d1fae5}
+.form-link, .form-link-center{font-size:13px; color:var(--muted); margin-top:12px}
+.form-link a, .form-link-center a{color:var(--primary); text-decoration:none}
+.cadastro-container{display:flex; gap:20px}
+.cadastro-left, .cadastro-right{flex:1}
+.password-strength{margin-top:8px}
+.strength-meter{background:#f1f5f9; height:8px; border-radius:8px; overflow:hidden}
+.strength-bar{height:100%; width:0}
+.btn-cancelar{background:#fff; color:var(--danger); padding:6px 10px; border:1px solid #fee2e2; border-radius:8px}
+.badge{display:inline-block; padding:6px 10px; border-radius:999px; font-size:13px}
+.badge-green{background:#ecfdf5; color:#065f46}
+.badge-yellow{background:#fffbeb; color:#92400e}
+.badge-gray{background:#f3f4f6; color:#374151}
+@media(max-width:880px){
+  .main-card{flex-direction:column}
+  .cadastro-container{flex-direction:column}
+}

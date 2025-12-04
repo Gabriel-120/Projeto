@@ -1,12 +1,9 @@
 <?php
 
-require_once __DIR__ . '/../model/cadastro.php';
-require_once __DIR__ . '/../model/cadastroDAO.php';
-require_once __DIR__ . '/../model/pagamento.php';
-require_once __DIR__ . '/../model/pagamentoDAO.php';
-require_once __DIR__ . '/../model/recuperacaoSenha.php';
-require_once __DIR__ . '/../model/recuperacaoSenhaDAO.php';
-require_once __DIR__ . '/../model/connection.php';
+require_once __DIR__ . '/../models/CadastroModel.php';
+require_once __DIR__ . '/../models/PagamentoModel.php';
+require_once __DIR__ . '/../models/RecuperacaoModel.php';
+require_once __DIR__ . '/../models/Connect.php';
 
 class CadastroController {
     private $cadastroDAO;
