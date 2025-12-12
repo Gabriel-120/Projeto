@@ -1,0 +1,34 @@
+/* Estilo mínimo para testes */
+body{font-family:Arial,Helvetica,sans-serif;margin:0;color:#222}
+header{background:#0a74da;color:#fff;padding:12px}
+.navbar{display:flex;align-items:center;justify-content:space-between}
+.nav{list-style:none;margin:0;padding:0;display:flex;gap:8px}
+.nav a{color:#fff;text-decoration:none}
+main{padding:20px}
+.hero{background:#f1f1f1;padding:20px;border-radius:6px}
+.auth{max-width:420px;margin:20px auto}
+.auth form label{display:block;margin-bottom:8px}
+.flash.error{background:#ffd6d6;padding:8px;border:1px solid #ff9d9d}
+.plano{border:1px solid #ddd;padding:12px;margin-bottom:12px}
+footer{background:#f8f8f8;padding:12px;text-align:center;margin-top:20px}
+
+/* Form and layout improvements */
+.container{max-width:1100px;margin:0 auto;padding:0 16px}
+.row{display:flex;gap:20px;flex-wrap:wrap}
+.col{flex:1 1 300px}
+.card{background:#fff;border:1px solid #e6e6e6;padding:16px;border-radius:6px}
+form input, form select, form textarea{width:100%;padding:8px;border:1px solid #ccc;border-radius:4px;box-sizing:border-box}
+form button{background:#0a74da;color:#fff;border:none;padding:10px 14px;border-radius:4px;cursor:pointer}
+
+/* Responsive */
+@media (max-width:768px){
+	.navbar{flex-direction:column;align-items:flex-start}
+	.nav{flex-wrap:wrap}
+	.hero{padding:14px}
+	main{padding:12px}
+}
+
+@media (max-width:480px){
+	.auth{padding:0 12px}
+	.col{flex-basis:100%}
+}

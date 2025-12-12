@@ -1,0 +1,9 @@
+<?php 
+function logoutController() {
+    session_start();
+    session_unset();
+    session_destroy();
+
+    header("Location: /");
+    exit;
+}
